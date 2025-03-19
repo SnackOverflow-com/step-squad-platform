@@ -3,8 +3,10 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
+import { UserCreateDto } from '../src/web/user/dto/user-create.dto';
+import { UserResponseDto } from '../src/web/user/dto/user-response-dto';
 
-describe('AppController (e2e)', () => {
+describe('UserController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -16,10 +18,28 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
+  it('getAllUsers (GET)', () => {
+    const createUserRequest = {
+      "firstName": "First",
+      "lastName": "Last",
+      "email": "first.last@gmail.com",
+      "age": 22,
+      "gender": "MALE",
+      "password": "testPassword"
+    } as UserCreateDto;
+
+    request(app.getHttpServer()).post('/user')
+      .send(createUserRequest)
       .expect(200)
       .expect('Hello World!');
+
+    return request(app.getHttpServer()).get('/user/list')
+      .expect(200)
+      .expect([{
+        "id": 1,
+        "firstName": "First",
+        "lastName": "Last",
+        "email": "first.last@gmail.com"
+      } as UserResponseDto]);
   });
 });

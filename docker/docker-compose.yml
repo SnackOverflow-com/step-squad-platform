@@ -1,0 +1,13 @@
+version: '3.9.6'
+
+services:
+  database:
+    image: 'postgres:16.1-alpine'
+    hostname: postgres
+    restart: always
+    container_name: step-squad-platform-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"

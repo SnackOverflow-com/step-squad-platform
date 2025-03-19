@@ -32,6 +32,25 @@
 $ npm install
 ```
 
+## Running the Database with Docker
+This project uses Docker to run the PostgreSQL database. In order to run the database you need to install the Docker desktop application.
+After that is complete, run the following command in the terminal that is positioned like this:
+
+```
+../step-squad-platform/docker
+```
+
+To start the database container, run:
+```bash
+$ docker compose up -d
+```
+This will start the database container in detached mode. Ensure Docker is running on your system before executing this command.
+
+To stop the database and delete the data and container, run this command:
+```bash
+$ docker compose down -v
+```
+
 ## Compile and run the project
 
 ```bash
@@ -87,12 +106,6 @@ Check out a few resources that may come in handy when working with NestJS:
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
