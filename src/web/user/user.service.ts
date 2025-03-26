@@ -1,63 +1,64 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserCreateDto } from './dto/user-create.dto';
-import { UserUpdateDto } from './dto/user-update.dto';
+import { UserCreateRequest } from './dto/user-create-request';
+import { UserUpdateRequest } from './dto/user-update-request';
 import { User } from './model/user.entity';
-import { from, map, Observable, switchMap, tap } from 'rxjs';
-import { UserResponseDto } from './dto/user-response-dto';
+import { UserResponse } from './dto/user-response';
 import { UserToUserResponseDtoMapper } from './mapper/user-to-user-response-dto-mapper';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly userToUserResponseDtoMapper: UserToUserResponseDtoMapper,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  createUser(createUserDto: UserCreateDto): Observable<UserResponseDto> {
-    const user: User = new User();
+  async createUser(createUserDto: UserCreateRequest): Promise<UserResponse> {
+    let user: User = new User();
     user.firstName = createUserDto.firstName;
     user.lastName = createUserDto.lastName;
-    user.age = createUserDto.age;
     user.email = createUserDto.email;
     user.password = createUserDto.password;
-    user.gender = createUserDto.gender;
 
-    return from(this.userRepository.save(user)).pipe(map((user) => this.userToUserResponseDtoMapper.map(user)));
+    user = await this.userRepository.save(user);
+
+    this.logger.log(`User with ID - ${user.id} created`);
+    return this.userToUserResponseDtoMapper.map(user);
   }
 
-  getAllUsers(): Observable<UserResponseDto[]> {
-    return from(this.userRepository.find()).pipe(map((users) => this.userToUserResponseDtoMapper.mapList(users)));
+  async getAllUsers(): Promise<UserResponse[]> {
+    const users = await this.userRepository.find();
+    return this.userToUserResponseDtoMapper.mapList(users);
   }
 
-  getUserById(id: number): Observable<UserResponseDto> {
-    return from(this.userRepository.findOneBy({ id })).pipe(
-      map((user) => {
-        if (!user) {
-          throw new NotFoundException();
-        }
+  async getUserById(id: number): Promise<UserResponse> {
+    const user = await this.userRepository.findOneBy({ id });
 
-        return this.userToUserResponseDtoMapper.map(user);
-      }),
-    );
+    if (!user) {
+      throw new NotFoundException(`User with ID - ${id} not found`);
+    }
+
+    return this.userToUserResponseDtoMapper.map(user);
   }
 
-  updateUser(id: number, updateUserDto: UserUpdateDto): Observable<UserResponseDto> {
-    return from(this.userRepository.findOneBy({ id })).pipe(
-      tap((user) => {
-        if (!user) {
-          throw new NotFoundException(`User with ID - ${id} not found`);
-        }
+  async updateUser(id: number, updateUserDto: UserUpdateRequest): Promise<UserResponse> {
+    const user = await this.userRepository.findOneBy({ id });
 
-        user.updateUser(updateUserDto);
-      }),
-      switchMap((user) => from(this.userRepository.save(user!))),
-      map((user) => this.userToUserResponseDtoMapper.map(user)),
-    );
+    if (!user) {
+      throw new NotFoundException(`User with ID - ${id} not found`);
+    }
+
+    user.updateUser(updateUserDto);
+    await this.userRepository.save(user);
+
+    this.logger.log(`User with ID - ${user.id} updated`);
+    return this.userToUserResponseDtoMapper.map(user);
   }
 
-  removeUser(id: number): void {
-    this.userRepository.delete(id);
+  async deleteUser(id: number): Promise<void> {
+    await this.userRepository.delete(id);
   }
 }

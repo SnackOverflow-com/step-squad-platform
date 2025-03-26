@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
-import { UserCreateDto } from '../src/web/user/dto/user-create.dto';
-import { UserResponseDto } from '../src/web/user/dto/user-response-dto';
+import { UserCreateRequest } from '../src/web/user/dto/user-create-request';
+import { UserResponse } from '../src/web/user/dto/user-response';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication<App>;
@@ -20,26 +20,26 @@ describe('UserController (e2e)', () => {
 
   it('getAllUsers (GET)', () => {
     const createUserRequest = {
-      "firstName": "First",
-      "lastName": "Last",
-      "email": "first.last@gmail.com",
-      "age": 22,
-      "gender": "MALE",
-      "password": "testPassword"
-    } as UserCreateDto;
+      firstName: 'First',
+      lastName: 'Last',
+      email: 'first.last@gmail.com',
+      age: 22,
+      gender: 'MALE',
+      password: 'testPassword',
+    } as UserCreateRequest;
 
-    request(app.getHttpServer()).post('/user')
-      .send(createUserRequest)
-      .expect(200)
-      .expect('Hello World!');
+    request(app.getHttpServer()).post('/user').send(createUserRequest).expect(200).expect('Hello World!');
 
-    return request(app.getHttpServer()).get('/user/list')
+    return request(app.getHttpServer())
+      .get('/user/list')
       .expect(200)
-      .expect([{
-        "id": 1,
-        "firstName": "First",
-        "lastName": "Last",
-        "email": "first.last@gmail.com"
-      } as UserResponseDto]);
+      .expect([
+        {
+          id: 1,
+          firstName: 'First',
+          lastName: 'Last',
+          email: 'first.last@gmail.com',
+        } as UserResponse,
+      ]);
   });
 });
