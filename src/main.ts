@@ -9,6 +9,13 @@ async function bootstrap() {
     }),
   });
 
+  // Enable CORS for any localhost origin
+  app.enableCors({
+    origin: /localhost(:[0-9]+)?$/,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  });
+
   await app.listen(process.env.PORT ?? 8080);
 }
 
