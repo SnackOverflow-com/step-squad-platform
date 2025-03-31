@@ -1,6 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Request, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserCreateRequest } from './dto/user-create-request';
 import { UserUpdateRequest } from './dto/user-update-request';
 import { UserResponse } from './dto/user-response';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
@@ -9,10 +8,10 @@ import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Get('me')
   @UseGuards(JwtAuthGuard)
-  createUser(@Body() createUserDto: UserCreateRequest): Promise<UserResponse> {
-    return this.userService.createUser(createUserDto);
+  async getCurrentUser(@Request() req: { user: { userId: number } }): Promise<UserResponse> {
+    return this.userService.getUserById(req.user.userId);
   }
 
   @Get('list')
