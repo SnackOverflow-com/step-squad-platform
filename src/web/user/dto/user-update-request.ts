@@ -5,6 +5,9 @@ import { Gender } from '../model/gender';
 
 export class UserUpdateRequest extends PartialType(UserCreateRequest) {
   @IsInt()
+  id: number;
+
+  @IsInt()
   age: number;
 
   @IsString()

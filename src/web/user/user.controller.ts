@@ -26,10 +26,10 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Patch(':id')
+  @Patch()
   @UseGuards(JwtAuthGuard)
-  updateUser(@Param('id') id: number, @Body() updateUserDto: UserUpdateRequest): Promise<UserResponse> {
-    return this.userService.updateUser(id, updateUserDto);
+  updateUser(@Body() updateUserDto: UserUpdateRequest): Promise<UserResponse> {
+    return this.userService.updateUser(updateUserDto);
   }
 
   @Delete(':id')
