@@ -44,7 +44,8 @@ export class UserService {
     return this.userToUserResponseDtoMapper.map(user);
   }
 
-  async updateUser(id: number, updateUserDto: UserUpdateRequest): Promise<UserResponse> {
+  async updateUser(updateUserDto: UserUpdateRequest): Promise<UserResponse> {
+    const id = updateUserDto.id;
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
