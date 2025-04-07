@@ -1,4 +1,4 @@
-import { Gender } from '../model/gender';
+import { Gender } from '../enum/gender';
 
 export interface UserResponse {
   id: number;
