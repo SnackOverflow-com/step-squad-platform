@@ -9,17 +9,17 @@ export class Activity {
   @PrimaryGeneratedColumn({ primaryKeyConstraintName: 'PK_activity' })
   id: number;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { eager: true })
   @JoinColumn({ name: 'user_id', foreignKeyConstraintName: 'FK_activity_user' })
   user: User;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date', nullable: false })
   date: Date;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: false })
   quantity: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: false })
   goal: number;
 
   @Column({ type: 'enum', enum: ActivityType, nullable: false })

@@ -5,7 +5,7 @@ export class ActivityToActivityResponseDtoMapper {
   public map(activity: Activity): ActivityResponse {
     return {
       id: activity.id,
-      userId: activity.user.id,
+      userId: activity.user?.id,
       date: activity.date,
       quantity: activity.quantity,
       goal: activity.goal,

@@ -1,8 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { UserUpdateRequest } from '../dto/user-update-request';
 import { Gender } from '../enum/gender';
 import { Exclude } from 'class-transformer';
-import { Activity } from '../../activity/model/activity.entity';
 import { ActivityDifficulty } from '../../activity/enum/activity-difficulty';
 
 @Entity('application_user')
@@ -24,13 +23,10 @@ export class User {
   age: number;
 
   @Column({ type: 'enum', enum: Gender, nullable: false })
-  gender: Gender;
-
-  @OneToMany(() => Activity, (activity) => activity.id)
-  activities: Activity[];
+  gender: Gender = Gender.UNSPECIFIED;
 
   @Column({ type: 'enum', enum: ActivityDifficulty, nullable: false })
-  difficulty: ActivityDifficulty;
+  difficulty: ActivityDifficulty = ActivityDifficulty.MEDIUM;
 
   @Exclude()
   @Column({ type: 'varchar', nullable: false })

@@ -1,4 +1,4 @@
 export enum ActivityType {
-  STEPS,
-  WATER,
+  STEPS = 'STEPS',
+  WATER = 'WATER',
 }
