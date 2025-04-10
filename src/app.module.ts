@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './web/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './web/auth/auth.module';
+import { ActivityModule } from './web/activity/activity.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from './web/auth/auth.module';
       logging: false,
     }),
     UserModule,
+    ActivityModule,
     AuthModule,
   ],
 })

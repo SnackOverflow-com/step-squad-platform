@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserCreateRequest } from './dto/user-create-request';
 import { UserUpdateRequest } from './dto/user-update-request';
 import { User } from './model/user.entity';
@@ -44,15 +44,18 @@ export class UserService {
     return this.userToUserResponseDtoMapper.map(user);
   }
 
-  async updateUser(updateUserDto: UserUpdateRequest): Promise<UserResponse> {
-    const id = updateUserDto.id;
+  async updateUser(userId: number, updateUserDto: UserUpdateRequest): Promise<UserResponse> {
+    const id = userId;
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException(`User with ID - ${id} not found`);
     }
 
-    user.updateUser(updateUserDto);
+    const ids = updateUserDto.friendIds?.filter(id => id !== userId);
+    const friends = ids ? await this.userRepository.findBy({ id: In(ids) }) : null;
+
+    user.updateUser(updateUserDto, friends);
     await this.userRepository.save(user);
 
     this.logger.log(`User with ID - ${user.id} updated`);
