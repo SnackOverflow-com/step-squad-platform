@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserUpdateRequest } from './dto/user-update-request';
 import { UserResponse } from './dto/user-response';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { User } from '../auth/decorator/user.decorator';
 
 @Controller('api/user')
 export class UserController {
@@ -10,31 +11,31 @@ export class UserController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getCurrentUser(@Request() req: { user: { userId: number } }): Promise<UserResponse> {
-    return this.userService.getUserById(req.user.userId);
+  async getCurrentUser(@User('userId') userId: number): Promise<UserResponse> {
+    return this.userService.getUserById(userId);
   }
 
   @Get('list')
   @UseGuards(JwtAuthGuard)
-  getAllUsers(): Promise<UserResponse[]> {
+  getAllUsers(@User('userId') userId: number): Promise<UserResponse[]> {
     return this.userService.getAllUsers();
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  getUserById(@Param('id') id: number): Promise<UserResponse> {
+  getUserById(@User('userId') userId: number, @Param('id') id: number): Promise<UserResponse> {
     return this.userService.getUserById(id);
   }
 
   @Patch()
   @UseGuards(JwtAuthGuard)
-  updateUser(@Body() updateUserDto: UserUpdateRequest): Promise<UserResponse> {
-    return this.userService.updateUser(updateUserDto);
+  updateUser(@User('userId') userId: number, @Body() updateUserDto: UserUpdateRequest): Promise<UserResponse> {
+    return this.userService.updateUser(userId, updateUserDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  deleteUser(@Param('id') id: number): Promise<void> {
+  deleteUser(@User('userId') userId: number, @Param('id') id: number): Promise<void> {
     return this.userService.deleteUser(+id);
   }
 }

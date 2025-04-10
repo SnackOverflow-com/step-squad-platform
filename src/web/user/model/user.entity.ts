@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { UserUpdateRequest } from '../dto/user-update-request';
 import { Gender } from '../enum/gender';
 import { Exclude } from 'class-transformer';
@@ -28,14 +28,27 @@ export class User {
   @Column({ type: 'enum', enum: ActivityDifficulty, nullable: false })
   difficulty: ActivityDifficulty = ActivityDifficulty.MEDIUM;
 
+  @ManyToMany(() => User, (user) => user.id, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinTable({
+    name: 'user_friend',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'friend_id', referencedColumnName: 'id' },
+  })
+  friends: User[];
+
   @Exclude()
   @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  public updateUser(updateUserDto: UserUpdateRequest): void {
+  public updateUser(updateUserDto: UserUpdateRequest, friends: User[] | null): void {
     this.firstName = updateUserDto.firstName ?? this.firstName;
     this.lastName = updateUserDto.lastName ?? this.lastName;
     this.age = updateUserDto.age ?? this.age;
     this.gender = updateUserDto.gender ?? this.gender;
+    this.friends = friends ?? this.friends;
+
+    if (friends) {
+      this.friends = friends;
+    }
   }
 }
