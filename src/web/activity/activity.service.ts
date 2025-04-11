@@ -5,6 +5,9 @@ import { Activity } from './model/activity.entity';
 import { ActivityToActivityResponseDtoMapper } from './mapper/activity-to-activity-response-dto-mapper';
 import { ActivityUpdateRequest } from './dto/activity-update-request';
 import { ActivityResponse } from './dto/activity-response';
+import { User } from '../user/model/user.entity';
+import { ActivityType } from './enum/activity-type';
+import { ActivityDifficulty } from './enum/activity-difficulty';
 
 @Injectable()
 export class ActivityService {
@@ -13,14 +16,53 @@ export class ActivityService {
   constructor(
     private readonly activityToActivityResponseDtoMapper: ActivityToActivityResponseDtoMapper,
     @InjectRepository(Activity) private readonly activityRepository: Repository<Activity>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async getActivity(): Promise<ActivityResponse> {
+  async getActivity(userId: number, type: ActivityType): Promise<ActivityResponse> {
     const date = new Date();
-    const activity = await this.activityRepository.findOneBy({ date });
+    // Format date to YYYY-MM-DD to ensure timezone doesn't affect the query
+    const dateString = date.toISOString().split('T')[0];
+
+    let activity = await this.activityRepository.findOne({
+      where: {
+        user: { id: userId },
+        date: new Date(dateString), // Use the formatted date string
+        type,
+      },
+      relations: ['user'], // Ensure user relation is loaded if needed by mapper
+    });
 
     if (!activity) {
-      throw new NotFoundException(`Activity for date - ${date} not found`);
+      this.logger.log(`Activity for user ${userId}, date ${dateString}, type ${type} not found. Creating new one.`);
+      const user = await this.userRepository.findOneBy({ id: userId });
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      activity = this.activityRepository.create({
+        user: user,
+        date: new Date(dateString), // Use the formatted date string
+        type: type,
+        quantity: 0, // Default value
+        goal: 10000, // Default value, consider making this configurable
+        difficulty: ActivityDifficulty.EASY, // Default value
+      });
+
+      await this.activityRepository.save(activity);
+      this.logger.log(`Created new Activity with ID - ${activity.id}`);
+
+      // Re-fetch to ensure all relations/defaults are correctly loaded if needed
+      activity = await this.activityRepository.findOne({
+        where: { id: activity.id },
+        relations: ['user'],
+      });
+
+      if (!activity) {
+        // This should theoretically not happen, but adding a safeguard
+        throw new Error('Failed to retrieve newly created activity.');
+      }
     }
 
     return this.activityToActivityResponseDtoMapper.map(activity);

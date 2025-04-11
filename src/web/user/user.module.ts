@@ -9,6 +9,6 @@ import { UserToUserResponseDtoMapper } from './mapper/user-to-user-response-dto-
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [UserService, UserToUserResponseDtoMapper],
-  exports: [UserService],
+  exports: [UserService, TypeOrmModule.forFeature([User])],
 })
 export class UserModule {}
