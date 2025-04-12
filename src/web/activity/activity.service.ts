@@ -41,27 +41,19 @@ export class ActivityService {
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
 
-      activity = this.activityRepository.create({
-        user: user,
-        date: new Date(dateString), // Use the formatted date string
-        type: type,
+      activity = await this.activityRepository.save({
+        user,
+        date: new Date(dateString),
+        type,
         quantity: 0, // Default value
         goal: 10000, // Default value, consider making this configurable
         difficulty: ActivityDifficulty.EASY, // Default value
       });
 
-      await this.activityRepository.save(activity);
       this.logger.log(`Created new Activity with ID - ${activity.id}`);
 
-      // Re-fetch to ensure all relations/defaults are correctly loaded if needed
-      activity = await this.activityRepository.findOne({
-        where: { id: activity.id },
-        relations: ['user'],
-      });
-
       if (!activity) {
-        // This should theoretically not happen, but adding a safeguard
-        throw new Error('Failed to retrieve newly created activity.');
+        throw new Error('Failed to create activity');
       }
     }
 
