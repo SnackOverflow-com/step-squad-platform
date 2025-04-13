@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, ParseEnumPipe, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, ParseEnumPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { ActivityService } from './activity.service';
 import { ActivityResponse } from './dto/activity-response';

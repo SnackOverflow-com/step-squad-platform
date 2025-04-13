@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserUpdateRequest } from './dto/user-update-request';
 import { UserResponse } from './dto/user-response';
@@ -15,27 +15,9 @@ export class UserController {
     return this.userService.getUserById(userId);
   }
 
-  @Get('list')
-  @UseGuards(JwtAuthGuard)
-  getAllUsers(@User('userId') userId: number): Promise<UserResponse[]> {
-    return this.userService.getAllUsers();
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  getUserById(@User('userId') userId: number, @Param('id') id: number): Promise<UserResponse> {
-    return this.userService.getUserById(id);
-  }
-
   @Patch()
   @UseGuards(JwtAuthGuard)
   updateUser(@User('userId') userId: number, @Body() updateUserDto: UserUpdateRequest): Promise<UserResponse> {
     return this.userService.updateUser(userId, updateUserDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  deleteUser(@User('userId') userId: number, @Param('id') id: number): Promise<void> {
-    return this.userService.deleteUser(+id);
   }
 }

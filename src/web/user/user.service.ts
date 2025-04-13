@@ -29,11 +29,6 @@ export class UserService {
     return this.userToUserResponseDtoMapper.map(user);
   }
 
-  async getAllUsers(): Promise<UserResponse[]> {
-    const users = await this.userRepository.find();
-    return this.userToUserResponseDtoMapper.mapList(users);
-  }
-
   async getUserById(id: number): Promise<UserResponse> {
     const user = await this.userRepository.findOneBy({ id });
 
@@ -52,7 +47,7 @@ export class UserService {
       throw new NotFoundException(`User with ID - ${id} not found`);
     }
 
-    const ids = updateUserDto.friendIds?.filter(id => id !== userId);
+    const ids = updateUserDto.friendIds?.filter((id) => id !== userId);
     const friends = ids ? await this.userRepository.findBy({ id: In(ids) }) : null;
 
     user.updateUser(updateUserDto, friends);
@@ -60,9 +55,5 @@ export class UserService {
 
     this.logger.log(`User with ID - ${user.id} updated`);
     return this.userToUserResponseDtoMapper.map(user);
-  }
-
-  async deleteUser(id: number): Promise<void> {
-    await this.userRepository.delete(id);
   }
 }
