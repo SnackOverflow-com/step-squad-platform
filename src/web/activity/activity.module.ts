@@ -10,6 +10,6 @@ import { UserModule } from '../user/user.module';
   imports: [TypeOrmModule.forFeature([Activity]), UserModule],
   controllers: [ActivityController],
   providers: [ActivityService, ActivityToActivityResponseDtoMapper],
-  exports: [ActivityService],
+  exports: [ActivityService, ActivityToActivityResponseDtoMapper],
 })
 export class ActivityModule {}
