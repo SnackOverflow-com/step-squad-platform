@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/model/user.entity';
@@ -85,5 +85,28 @@ export class FriendService {
     );
 
     return friendsWithActivities;
+  }
+
+  async deleteFriend(userId: number, friendId: number): Promise<void> {
+    // First check if both users exist
+    const userExists = await this.userRepository.exist({ where: { id: userId } });
+    if (!userExists) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Check if the relationship exists using a more efficient query
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('user.friends', 'friend')
+      .where('user.id = :userId', { userId })
+      .andWhere('friend.id = :friendId', { friendId });
+
+    const relationship = await queryBuilder.getOne();
+    if (!relationship) {
+      throw new NotFoundException(`Friend with ID ${friendId} not found in user's friend list`);
+    }
+
+    // Use the query builder to directly remove the relation in the join table
+    await this.userRepository.createQueryBuilder().relation(User, 'friends').of(userId).remove(friendId);
   }
 }
