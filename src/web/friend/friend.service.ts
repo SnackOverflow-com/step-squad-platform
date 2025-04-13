@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/model/user.entity';
@@ -108,5 +108,38 @@ export class FriendService {
 
     // Use the query builder to directly remove the relation in the join table
     await this.userRepository.createQueryBuilder().relation(User, 'friends').of(userId).remove(friendId);
+  }
+
+  async addFriend(userId: number, friendId: number): Promise<void> {
+    // Prevent adding oneself as a friend
+    if (userId === friendId) {
+      throw new BadRequestException('Cannot add yourself as a friend');
+    }
+
+    // Check if both users exist
+    const userExists = await this.userRepository.exist({ where: { id: userId } });
+    if (!userExists) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const friendExists = await this.userRepository.exist({ where: { id: friendId } });
+    if (!friendExists) {
+      throw new NotFoundException(`User with ID ${friendId} not found`);
+    }
+
+    // Check if they are already friends
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('user.friends', 'friend')
+      .where('user.id = :userId', { userId })
+      .andWhere('friend.id = :friendId', { friendId });
+
+    const relationship = await queryBuilder.getOne();
+    if (relationship) {
+      throw new BadRequestException(`User with ID ${friendId} is already a friend`);
+    }
+
+    // Add the friend relationship
+    await this.userRepository.createQueryBuilder().relation(User, 'friends').of(userId).add(friendId);
   }
 }
