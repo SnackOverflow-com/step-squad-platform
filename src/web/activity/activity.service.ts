@@ -46,7 +46,7 @@ export class ActivityService {
         date: new Date(dateString),
         type,
         quantity: 0, // Default value
-        goal: 10000, // Default value, consider making this configurable
+        goal: type === ActivityType.STEPS ? 10000 : 2000, // todo make a generator for this,
         difficulty: ActivityDifficulty.EASY, // Default value
       });
 

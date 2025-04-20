@@ -45,6 +45,7 @@ export class User {
     this.lastName = updateUserDto.lastName ?? this.lastName;
     this.age = updateUserDto.age ?? this.age;
     this.gender = updateUserDto.gender ?? this.gender;
+    this.difficulty = updateUserDto.difficulty ?? this.difficulty;
     this.friends = friends ?? this.friends;
 
     if (friends) {

@@ -1,4 +1,5 @@
 import { Gender } from '../enum/gender';
+import { ActivityDifficulty } from '../../activity/enum/activity-difficulty';
 
 export interface UserResponse {
   id: number;
@@ -7,4 +8,5 @@ export interface UserResponse {
   email: string;
   age: number;
   gender: Gender;
+  difficulty: ActivityDifficulty;
 }

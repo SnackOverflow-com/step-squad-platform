@@ -11,6 +11,7 @@ export class UserToUserResponseDtoMapper extends Mapper<User, UserResponse> {
       email: user.email,
       age: user.age,
       gender: user.gender,
+      difficulty: user.difficulty,
     } as UserResponse;
   }
 }
