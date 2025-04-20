@@ -19,6 +19,32 @@ export class ActivityService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
+  /**
+   * Generates an activity goal based on activity type and difficulty
+   * @param type Activity type (STEPS or WATER)
+   * @param difficulty Activity difficulty (EASY, MEDIUM, or HARD)
+   * @returns The goal value appropriate for the type and difficulty
+   */
+  private generateGoal(type: ActivityType, difficulty: ActivityDifficulty): number {
+    if (type === ActivityType.STEPS) {
+      switch (difficulty) {
+        case ActivityDifficulty.EASY:
+          return 7000;
+        case ActivityDifficulty.MEDIUM:
+          return 10000;
+        case ActivityDifficulty.HARD:
+          return 20000;
+        default:
+          return 10000; // Default to MEDIUM if unknown difficulty
+      }
+    } else if (type === ActivityType.WATER) {
+      return 2000; // Water goal is the same for all difficulty levels
+    }
+
+    // Default fallback
+    return type === ActivityType.STEPS ? 10000 : 2000;
+  }
+
   async getActivity(userId: number, type: ActivityType): Promise<ActivityResponse> {
     const date = new Date();
     // Format date to YYYY-MM-DD to ensure timezone doesn't affect the query
@@ -41,13 +67,16 @@ export class ActivityService {
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
 
+      // Use the user's preferred difficulty to generate the goal
+      const goal = this.generateGoal(type, user.difficulty);
+
       activity = await this.activityRepository.save({
         user,
         date: new Date(dateString),
         type,
         quantity: 0, // Default value
-        goal: type === ActivityType.STEPS ? 10000 : 2000, // todo make a generator for this,
-        difficulty: ActivityDifficulty.EASY, // Default value
+        goal,
+        difficulty: user.difficulty, // Use user's preferred difficulty
       });
 
       this.logger.log(`Created new Activity with ID - ${activity.id}`);
