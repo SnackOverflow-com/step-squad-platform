@@ -21,6 +21,7 @@ export class UserToFriendResponseMapper extends Mapper<User, FriendResponseDto> 
       email: user.email,
       age: user.age,
       gender: user.gender,
+      difficulty: user.difficulty,
       isFriend,
     };
   }
