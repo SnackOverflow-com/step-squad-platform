@@ -11,3 +11,12 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - '1080:1080'
+      - '1025:1025'
+    volumes:
+      - ./maildev-data:/home/maildev/data
+    command: bin/maildev --mail-directory /home/maildev/data
