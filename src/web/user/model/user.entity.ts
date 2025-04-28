@@ -52,4 +52,8 @@ export class User {
       this.friends = friends;
     }
   }
+
+  public updatePassword(password: string): void {
+    this.password = password;
+  }
 }
