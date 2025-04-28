@@ -51,6 +51,13 @@ To stop the database and delete the data and container, run this command:
 $ docker compose down -v
 ```
 
+## MailDev
+
+When executing the ```docker compose up -d``` command,
+this will start the MailDev service used to mock the sending of emails to users.
+
+You can access the MailDev UI by opening ```localhost:1080``` in your browser.
+
 ## Compile and run the project
 
 ```bash
