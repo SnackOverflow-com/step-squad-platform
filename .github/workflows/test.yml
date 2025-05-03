@@ -28,24 +28,3 @@ jobs:
       # Run tests with coverage
       - name: Run tests
         run: npm test -- --coverage
-
-      # Debug branch and PR information
-      - name: Debug branch and PR info
-        run: |
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Pull Request Number: ${{ github.event.pull_request.number }}"
-          echo "Head Ref: ${{ github.head_ref }}"
-          echo "Base Ref: ${{ github.base_ref }}"
-          echo "Repository: ${{ github.repository }}"
-
-      # Run SonarQube analysis
-      - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@v3
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectVersion=${{ github.sha }}
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-            -Dsonar.pullrequest.branch=${{ github.head_ref }}
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
