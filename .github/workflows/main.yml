@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   pull_request:
@@ -16,6 +16,7 @@ concurrency:
 permissions:
   contents: read
   id-token: write
+  pull-requests: write # Required for SonarQube PR decoration
 
 jobs:
   test:
