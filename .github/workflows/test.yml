@@ -1,16 +1,7 @@
-name: Run Tests
+name: Test
 
 on:
-  push:
-    branches:
-      - '**' # Run on all branches
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - ready_for_review # Run only when PR is marked "Ready for Review"
-    branches:
-      - '**' # Run for PRs targeting any branch
+  workflow_call:
 
 jobs:
   test:
@@ -25,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Specify the Node.js version (adjust if needed)
+          node-version: '22.15.0' # Specify the Node.js version (adjust if needed)
           cache: 'npm' # Cache npm dependencies for faster runs
 
       # Install dependencies
@@ -35,16 +26,3 @@ jobs:
       # Run tests
       - name: Run tests
         run: npm test
-
-      # Trigger build workflow on success
-      - name: Trigger Build Workflow
-        if: success() # Only run if tests pass
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'build.yml',
-              ref: context.ref
-            });

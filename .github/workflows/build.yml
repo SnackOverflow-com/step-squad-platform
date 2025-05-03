@@ -1,17 +1,7 @@
-name: Build Application
+name: Build
 
 on:
-  push:
-    branches:
-      - '**' # Run on all branches
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - ready_for_review # Run only when PR is marked "Ready for Review"
-    branches:
-      - '**' # Run for PRs targeting any branch
-  workflow_dispatch: # Allow triggering from test workflow
+  workflow_call:
 
 jobs:
   build:

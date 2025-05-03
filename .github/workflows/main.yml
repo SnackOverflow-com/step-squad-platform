@@ -1,0 +1,30 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - ready_for_review # Run only when PR is marked "Ready for Review"
+    branches:
+      - '**' # Run for PRs targeting any branch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  build:
+    needs: test
+    name: Build
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
